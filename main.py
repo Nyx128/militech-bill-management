@@ -14,9 +14,6 @@ from datetime import date
 #dpb(decrement product count in bill)
 #rb(reset bill)
 #dc(display customer)
-#sps(show product sales)
-#spr(show product revenue)
-#scs(show customer stats)
 #sb(show bill)
 #ct(complete transaction)
 
@@ -29,6 +26,8 @@ from datetime import date
 #table definitions
 INV = "inventory"
 CUS = "customers"
+TRA = "transactions"
+SAL = "sales"
 
 #product id list
 #product id must be unique, so everytime i add a product its id will be stored here to check whether id is duplicated or not
@@ -38,12 +37,10 @@ cid_list = []
 #bill dictionary
 #it will store the p_id of products and their count as key value pair
 bill = {}
+total = 0
 
-#_user = input("username: ")
-#_passwd = input("password: ")
-
-_user = "root"
-_passwd = "Ghostryder@812"
+_user = input("username: ")
+_passwd = input("password: ")
 
 mydb = connector.connect(_user, _passwd, "militech")
 
@@ -138,17 +135,50 @@ def rem_customer(c_id: int):
   else:
     return -1
   
-def display_customer(cid: int):
-  q = connector.where_query(mydb, CUS, ("name", ), ("c_id",), (cid, ) )
+def display_customer(c_id: int):
+  q = connector.where_query(mydb, CUS, ("name", ), ("c_id",), (c_id, ) )
   return q[0][0]
 
+def get_product_name(p_id: int):
+  q = connector.where_query(mydb, INV, ("name", ), ("p_id", ), (p_id, ))
+  return q[0][0]
+
+def get_product_unit_price(p_id: int):
+  q = connector.where_query(mydb, INV, ("unit_price", ), ("p_id", ), (p_id, ))
+  return q[0][0]
+
+def add_sales(p_id :int, day: date, count: int):
+  connector.insert_values(mydb, SAL, (p_id, day, count))
+
+def add_transaction(c_id: int, amount: int):
+  connector.insert_values(mydb, TRA, (c_id, amount))
+
 def show_bill():
-  print(bill)
+  t_price = 0
+  for x in bill:
+    line = str(get_product_name(x)) + ": " + str(bill[0])  + "\n"
+    print(line)
+    t_price += get_product_unit_price(x) * bill[0]
+
+  print("Total: ", t_price)
+
+def complete_transaction(c_name : str, day : date):
+  #decrement items from inv
+  for x in bill:
+    decrement_product_in_inv(x, bill[x])
+    add_sales(x, day, bill[x])
+
+    #todo search for customer if its not in table make new customer with new id and then modify sales and transaction tables
+  reset_bill()
 
 def main():
+  #todo get date
   c_name = input("Customer name> ")
   fetch_pid_list()
   fetch_cid_list()
+
+  add_product_to_bill(0, 50)
+  show_bill()
 
 main()
 
