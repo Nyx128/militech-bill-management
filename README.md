@@ -1,5 +1,5 @@
 # MILITECH BILL MANAGEMENT
-This project is intended to showcase the capabilities of python and sql connectivities
+This project is intended to showcase the capabilities of python and sql connectivity
 
 ## Setup
 All that is needed to be able to run this project is to have SQL 8.0.35 installed in the host machine which can be downloaded from
