@@ -324,6 +324,10 @@ def sample_input():
     show_bill()
     wait_for_next()
     sample_input()
+  elif cmd == "rb":
+    reset_bill()
+    wait_for_next()
+    sample_input()
   elif cmd == "ct":
     customer_name = input("Customer name> ")
     day = ask_date()
